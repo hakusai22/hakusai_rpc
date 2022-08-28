@@ -53,7 +53,7 @@ func main() {
 	// send request & receive response
 	for i := 0; i < 5; i++ {
 		h := &codec.Header{
-			ServiceMethod: "WEb.Sum",
+			ServiceMethod: "Web.Sum",
 			Seq:           uint64(i),
 		}
 		_ = cc.Write(h, fmt.Sprintf("geerpc req %d", h.Seq))

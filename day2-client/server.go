@@ -2,12 +2,12 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package geerpc
+package hakusai_rpc
 
 import (
 	"encoding/json"
 	"fmt"
-	"geerpc/codec"
+	"hakusai_rpc/codec"
 	"io"
 	"log"
 	"net"
