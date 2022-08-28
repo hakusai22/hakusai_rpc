@@ -1,4 +1,4 @@
-package geerpc
+package hakusai_rpc
 
 import (
 	"go/ast"
@@ -6,6 +6,17 @@ import (
 	"reflect"
 	"sync/atomic"
 )
+
+/**
+每一个 methodType 实例包含了一个方法的完整信息。包括
+
+method：方法本身
+ArgType：第一个参数的类型
+ReplyType：第二个参数的类型
+numCalls：后续统计方法调用次数时会用到
+另外，我们还实现了 2 个方法 newArgv 和 newReplyv，用于创建对应类型的实例。newArgv 方法有一个小细节，
+指针类型和值类型创建实例的方式有细微区别。
+*/
 
 type methodType struct {
 	method    reflect.Method // 方法本身
@@ -42,6 +53,12 @@ func (m *methodType) newReplyv() reflect.Value {
 	}
 	return replyv
 }
+
+/**
+service 的定义也是非常简洁的，name 即映射的结构体的名称，比如 T，
+比如 WaitGroup；typ 是结构体的类型；rcvr 即结构体的实例本身，
+保留 rcvr 是因为在调用时需要 rcvr 作为第 0 个参数；method 是 map 类型，存储映射的结构体的所有符合条件的方法。
+*/
 
 type service struct {
 	name   string

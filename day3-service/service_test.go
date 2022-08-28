@@ -1,4 +1,4 @@
-package geerpc
+package hakusai_rpc
 
 import (
 	"fmt"
