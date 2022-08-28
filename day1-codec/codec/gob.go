@@ -13,10 +13,10 @@ import (
 //dec 和 enc 对应 gob 的 Decoder 和 Encoder，
 //buf 是为了防止阻塞而创建的带缓冲的 Writer，一般这么做能提升性能。
 type GobCodec struct {
-	conn io.ReadWriteCloser
-	buf  *bufio.Writer
-	dec  *gob.Decoder
-	enc  *gob.Encoder
+	conn io.ReadWriteCloser //连接
+	buf  *bufio.Writer      //io的buffer
+	dec  *gob.Decoder       //解密
+	enc  *gob.Encoder       //加密
 }
 
 // 将空值转换为 *GobCodec 类型
@@ -34,6 +34,7 @@ func NewGobCodec(conn io.ReadWriteCloser) Codec {
 	}
 }
 
+// 接着实现 ReadHeader、ReadBody、Write 和 Close 方法。
 func (c *GobCodec) ReadHeader(h *Header) error {
 	return c.dec.Decode(h)
 }

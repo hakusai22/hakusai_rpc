@@ -24,7 +24,8 @@ type NewCodecFunc func(io.ReadWriteCloser) Codec
 
 type Type string
 
-// 我们定义了 2 种 Codec，Gob 和 Json，但是实际代码中只实现了 Gob 一种，事实上，2 者的实现非常接近，甚至只需要把 gob 换成 json 即可
+// 我们定义了 2 种 Codec，Gob 和 Json，但是实际代码中只实现了 Gob 一种，
+// 事实上，2 者的实现非常接近，甚至只需要把 gob 换成 json 即可
 const (
 	GobType  Type = "application/gob"
 	JsonType Type = "application/json" // not implemented

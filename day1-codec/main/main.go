@@ -3,14 +3,17 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"geerpc"
-	"geerpc/codec"
+	"hakusai_rpc"
+	"hakusai_rpc/codec"
 	"log"
 	"net"
 	"time"
 )
 
 /**
+
+使用 encoding/gob 实现消息的编解码(序列化与反序列化)
+
 如果不加消息编码，本质上是两个tcp的conn直接通信：
 w -> conn -> conn -> r；
 如果加上消息编码，就变成
@@ -20,7 +23,7 @@ w -> bufio -> gob -> conn -> conn -> gob -> r
 
 func startServer(addr chan string) {
 	// pick a free port
-	l, err := net.Listen("tcp", ":0")
+	l, err := net.Listen("tcp", ":8080")
 	// 失败 直接打印日志
 	if err != nil {
 		log.Fatal("network error:", err)
@@ -28,7 +31,7 @@ func startServer(addr chan string) {
 	log.Println("start rpc server on", l.Addr())
 	// 对地址进行赋值 应该是引用传递
 	addr <- l.Addr().String()
-	geerpc.Accept(l)
+	hakusai_rpc.Accept(l)
 }
 
 func main() {
@@ -45,12 +48,12 @@ func main() {
 	// 客户端简单的使用time.sleep()方式隔离协议交换阶段与RPC消息阶段，减少这种问题发生的可能。
 	time.Sleep(time.Second)
 	// send options
-	_ = json.NewEncoder(conn).Encode(geerpc.DefaultOption)
+	_ = json.NewEncoder(conn).Encode(hakusai_rpc.DefaultOption)
 	cc := codec.NewGobCodec(conn)
 	// send request & receive response
 	for i := 0; i < 5; i++ {
 		h := &codec.Header{
-			ServiceMethod: "Foo.Sum",
+			ServiceMethod: "WEb.Sum",
 			Seq:           uint64(i),
 		}
 		_ = cc.Write(h, fmt.Sprintf("geerpc req %d", h.Seq))
