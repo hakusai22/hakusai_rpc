@@ -9,15 +9,15 @@ import (
 	"time"
 )
 
-// 自己实现一个简单的支持心跳保活的注册中心。
-// 首先定义 GeeRegistry 结构体，
-// 默认超时时间设置为 5 min，也就是说，任何注册的服务超过 5 min，即视为不可用状态。
+// GeeRegistry 自己实现一个简单的支持心跳保活的注册中心。
+// 首先定义 GeeRegistry 结构体， 默认超时时间设置为 5 min，也就是说，任何注册的服务超过 5 min，即视为不可用状态。
 type GeeRegistry struct {
 	timeout time.Duration
 	mu      sync.Mutex // protect following
 	servers map[string]*ServerItem
 }
 
+// ServerItem 地址+开始时间
 type ServerItem struct {
 	Addr  string
 	start time.Time
@@ -40,9 +40,12 @@ var DefaultGeeRegister = New(defaultTimeout)
 
 // putServer：添加服务实例，如果服务已经存在，则更新 start。
 func (r *GeeRegistry) putServer(addr string) {
+	//加锁 解锁
 	r.mu.Lock()
 	defer r.mu.Unlock()
+	//根据地址找到服务实体
 	s := r.servers[addr]
+	//不存在 就添加 存在就更新时间
 	if s == nil {
 		r.servers[addr] = &ServerItem{Addr: addr, start: time.Now()}
 	} else {
@@ -66,22 +69,24 @@ func (r *GeeRegistry) aliveServers() []string {
 	return alive
 }
 
-// Get：返回所有可用的服务列表，通过自定义字段 X-Geerpc-Servers 承载。
-// Post：添加服务实例或发送心跳，通过自定义字段 X-Geerpc-Server 承载。
+// Get：返回所有可用的服务列表，通过自定义字段 X-HakusaiRpc-Servers 承载。
+// Post：添加服务实例或发送心跳，通过自定义字段 X-HakusaiRpc-Server 承载。
 func (r *GeeRegistry) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "GET":
-		// keep it simple, server is in req.Header
+		// 过自定义字段 X-HakusaiRpc-Servers
 		w.Header().Set("X-HakusaiRpc-Servers", strings.Join(r.aliveServers(), ","))
 	case "POST":
-		// keep it simple, server is in req.Header
+		// 过自定义字段 X-HakusaiRpc-Servers
 		addr := req.Header.Get("X-HakusaiRpc-Server")
 		if addr == "" {
+			//500
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 		r.putServer(addr)
 	default:
+		//405 状态方法不允许
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }

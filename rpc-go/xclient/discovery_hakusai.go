@@ -52,6 +52,7 @@ func (d *GeeRegistryDiscovery) Refresh() error {
 	return nil
 }
 
+// Get 和 GetAll 与 MultiServersDiscovery 相似，唯一的不同在于，GeeRegistryDiscovery 需要先调用 Refresh 确保服务列表没有过期。
 func (d *GeeRegistryDiscovery) Get(mode SelectMode) (string, error) {
 	if err := d.Refresh(); err != nil {
 		return "", err
