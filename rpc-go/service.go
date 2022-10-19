@@ -60,6 +60,7 @@ func newService(rcvr interface{}) *service {
 	return s
 }
 
+// 注册方法 传入map
 func (s *service) registerMethods() {
 	s.method = make(map[string]*methodType)
 	for i := 0; i < s.typ.NumMethod(); i++ {

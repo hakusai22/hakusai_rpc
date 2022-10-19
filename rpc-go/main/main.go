@@ -37,6 +37,7 @@ func startRegistry(wg *sync.WaitGroup) {
 // 添加调用注册中心的 Heartbeat 方法的逻辑，定期向注册中心发送心跳保活。
 func startServer(registryAddr string, wg *sync.WaitGroup) {
 	var foo Foo
+	//tcp
 	l, _ := net.Listen("tcp", ":0")
 	server := hakusai_rpc.NewServer()
 	_ = server.Register(&foo)
@@ -97,9 +98,11 @@ func broadcast(registry string) {
 
 // 确保注册中心启动后，再启动 RPC 服务端，最后客户端远程调用。
 func main() {
+	// 使用 log.SetFlags() 函数在日志消息中添加完整的程序文件作为前缀
 	log.SetFlags(0)
 	registryAddr := "http://localhost:9999/_hakusai_rpc_/registry"
 	var wg sync.WaitGroup
+	//等待一个协程
 	wg.Add(1)
 	//1. 协程开启注册中心
 	go startRegistry(&wg)
@@ -107,6 +110,7 @@ func main() {
 
 	time.Sleep(time.Second)
 
+	//等待2个协程
 	wg.Add(2)
 	// 2. 在注册中心注册两个服务
 	go startServer(registryAddr, &wg)
